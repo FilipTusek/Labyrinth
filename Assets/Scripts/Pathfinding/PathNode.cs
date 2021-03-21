@@ -15,7 +15,7 @@ namespace Labyrinth.Pathfinding
 
         public bool IsWalkable;
         public PathNode CameFromNode;
-        
+
         public PathNode(Grid<PathNode> grid, int x, int y)
         {
             _grid = grid;
@@ -28,7 +28,13 @@ namespace Labyrinth.Pathfinding
         {
             FCost = GCost + HCost;
         }
-        
+
+        public void SetIsWalkable(bool isWalkable)
+        {
+            IsWalkable = isWalkable;
+            _grid.TriggerGridObjectChanged(X, Y);
+        }
+
         public override string ToString()
         {
             return X + "," + Y;

@@ -37,7 +37,7 @@ namespace GridMap
                 }
             }
 
-            bool showDebug = true;
+            bool showDebug = false;
             if (showDebug) {
                 TextMesh[,] debugTextArray = new TextMesh[_width, _height];
 

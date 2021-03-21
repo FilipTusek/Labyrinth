@@ -75,7 +75,7 @@ namespace Labyrinth.Pathfinding
             return null;
         }
 
-        private PathNode GetNode(int x, int y)
+        public PathNode GetNode(int x, int y)
         {
             return _grid.GetGridObject(x, y);
         }
