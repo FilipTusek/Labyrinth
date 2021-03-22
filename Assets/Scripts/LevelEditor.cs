@@ -65,7 +65,7 @@ public class LevelEditor : MonoBehaviour
 
     private void GenerateGrid()
     {
-        _pathfinding = new Pathfinding(Width, Height);
+        _pathfinding = new Pathfinding(Width, Height, CellSize);
         _pathfindingVisual.SetGrid(_pathfinding.GetGrid());
     }
 

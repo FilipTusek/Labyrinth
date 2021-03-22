@@ -37,7 +37,8 @@ namespace Labyrinth.Pathfinding
 
         public override string ToString()
         {
-            return X + "," + Y;
+            //return X + "," + Y;
+            return "" + IsWalkable;
         }
     }
 }

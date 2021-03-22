@@ -5,22 +5,25 @@ namespace Utils
     public static class MeshUtils
     {
         private static Quaternion[] _cachedQuaternionEulerArray;
-        
-        private static void CacheQuaternionEuler() {
+
+        private static void CacheQuaternionEuler()
+        {
             if (_cachedQuaternionEulerArray != null) return;
             _cachedQuaternionEulerArray = new Quaternion[360];
-            for (int i=0; i<360; i++) {
-                _cachedQuaternionEulerArray[i] = Quaternion.Euler(0,0,i);
+            for (int i = 0; i < 360; i++) {
+                _cachedQuaternionEulerArray[i] = Quaternion.Euler(0, 0, i);
             }
         }
-        private static Quaternion GetQuaternionEuler(float rotFloat) {
+
+        private static Quaternion GetQuaternionEuler(float rotFloat)
+        {
             int rot = Mathf.RoundToInt(rotFloat);
             rot = rot % 360;
             if (rot < 0) rot += 360;
             if (_cachedQuaternionEulerArray == null) CacheQuaternionEuler();
             return _cachedQuaternionEulerArray[rot];
         }
-        
+
         public static void CreateEmptyMeshArrays(int quadCount, out Vector3[] vertices, out Vector2[] uvs, out int[] triangles)
         {
             vertices = new Vector3[4 * quadCount];
@@ -56,6 +59,16 @@ namespace Utils
             uvs[vIndex1] = new Vector2(uv00.x, uv00.y);
             uvs[vIndex2] = new Vector2(uv11.x, uv00.y);
             uvs[vIndex3] = new Vector2(uv11.x, uv11.y);
+
+            int tIndex = index * 6;
+
+            triangles[tIndex + 0] = vIndex0;
+            triangles[tIndex + 1] = vIndex3;
+            triangles[tIndex + 2] = vIndex1;
+
+            triangles[tIndex + 3] = vIndex1;
+            triangles[tIndex + 4] = vIndex3;
+            triangles[tIndex + 5] = vIndex2;
         }
     }
 }

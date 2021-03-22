@@ -9,7 +9,7 @@ namespace Managers
     {
         private void Update()
         {
-            if (Input.GetMouseButton(0)) {
+            if (Input.GetMouseButtonDown(0)) {
                 EventManager.OnLMBPressed.OnEventRaised?.Invoke(UtilsClass.GetMouseWorldPosition());
             }
 

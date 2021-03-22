@@ -9,14 +9,18 @@ namespace Labyrinth.Pathfinding
     {
         private const int MOVE_STRAIGHT_COST = 10;
         private const int MOVE_DIAGONAL_COST = 14;
+     
+        //This project has the need for only one pathfinding!!! 
+        public static Pathfinding Instance { get; private set; }
         
         private Grid<PathNode> _grid;
         private List<PathNode> _openList;
-        private List<PathNode> _closedList;
+        private HashSet<PathNode> _closedList;
         
-        public Pathfinding(int width, int height)
+        public Pathfinding(int width, int height, float cellSize)
         {
-            _grid = new Grid<PathNode>(width, height, 10f, Vector3.zero, (Grid<PathNode> _grid, int x, int y) => new PathNode(_grid, x, y));
+            Instance = this;
+            _grid = new Grid<PathNode>(width, height, cellSize, Vector3.zero, (Grid<PathNode> _grid, int x, int y) => new PathNode(_grid, x, y));
         }
 
         public Grid<PathNode> GetGrid()
@@ -28,9 +32,11 @@ namespace Labyrinth.Pathfinding
         {
             PathNode startNode = _grid.GetGridObject(startX, startY);
             PathNode endNode = _grid.GetGridObject(endX, endY);
+
+            if (endNode == null) return null;
             
             _openList = new List<PathNode> {startNode};
-            _closedList = new List<PathNode>();
+            _closedList = new HashSet<PathNode>();
 
             for (int x = 0; x < _grid.GetWidth(); x++) {
                 for (int y = 0; y < _grid.GetHeight(); y++) {

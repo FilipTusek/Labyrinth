@@ -49,11 +49,12 @@ namespace GridMap
                     Vector3 quadSize = new Vector3(1, 1) * _grid.GetCellSize();
 
                     PathNode pathNode = _grid.GetGridObject(x, y);
+                    Vector2 gridValueUV = Vector2.zero;
 
                     if (pathNode.IsWalkable)
-                        quadSize = Vector3.zero;
+                        gridValueUV = new Vector2(0.99f, 0f);
                     
-                    MeshUtils.AddToMeshArrays(vertices, uv, triangles, index, _grid.GetWorldPosition(x, y) + quadSize * 0.5f, 0f, quadSize, Vector2.zero, Vector2.one);
+                    MeshUtils.AddToMeshArrays(vertices, uv, triangles, index, _grid.GetWorldPosition(x, y) + quadSize * 0.5f, 0f, quadSize, gridValueUV, gridValueUV);
                 }
             }
 
