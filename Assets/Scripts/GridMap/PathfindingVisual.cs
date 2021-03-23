@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Specialized;
 using Labyrinth.Pathfinding;
+using Unity.Mathematics;
 using UnityEngine;
 using Utils;
 
@@ -8,59 +9,48 @@ namespace GridMap
 {
     public class PathfindingVisual : MonoBehaviour
     {
-        private Grid<PathNode> _grid;
-        private Mesh _mesh;
-        private bool _updateMesh;
+        [SerializeField] private GameObject _tilePrefab;
+        [SerializeField] private Transform _tilesParent;
+        
+        [SerializeField] private Material _walkableMaterial;
+        [SerializeField] private Material _unwalkableMaterial;
 
-        private void Awake()
-        {
-            _mesh = new Mesh();
-            GetComponent<MeshFilter>().mesh = _mesh;
-        }
+        private MeshRenderer[,] _instantiatedTileRenderers;
+
+        private Grid<PathNode> _grid;
 
         public void SetGrid(Grid<PathNode> grid)
         {
             _grid = grid;
-            UpdateVisual();
+            CreateGridVisuals();
 
             _grid.OnGridValueChanged += OnGridValueChanged;
         }
 
         private void OnGridValueChanged(object sender, Grid<PathNode>.OnGridValueChangedEventArgs e)
         {
-            _updateMesh = true;
+            UpdateTileVisual(e.X, e.Y);
         }
 
-        private void LateUpdate()
+        private void UpdateTileVisual(int x, int y)
         {
-            if (_updateMesh) {
-                _updateMesh = false;
-                UpdateVisual();
-            }
+            _instantiatedTileRenderers[x, y].material = _grid.GetGridObject(x, y).IsWalkable ? _walkableMaterial : _unwalkableMaterial;
         }
 
-        private void UpdateVisual()
+        private void CreateGridVisuals()
         {
-            MeshUtils.CreateEmptyMeshArrays(_grid.GetWidth() * _grid.GetHeight(), out Vector3[] vertices, out Vector2[] uv, out int[] triangles);
+            _instantiatedTileRenderers = new MeshRenderer[_grid.GetWidth(), _grid.GetHeight()];
 
             for (int x = 0; x < _grid.GetWidth(); x++) {
                 for (int y = 0; y < _grid.GetHeight(); y++) {
-                    int index = x * _grid.GetHeight() + y;
-                    Vector3 quadSize = new Vector3(1, 1) * _grid.GetCellSize();
+                    Vector3 position = new Vector3(x * _grid.GetCellSize(), y * _grid.GetCellSize(), 0) + _tilePrefab.transform.localScale * _grid.GetCellSize() / 2;
+                    var tile = Instantiate(_tilePrefab, position, quaternion.identity, _tilesParent).GetComponent<MeshRenderer>();
+                    tile.transform.localScale = Vector2.one * _grid.GetCellSize();
+                    _instantiatedTileRenderers[x, y] = tile;
 
-                    PathNode pathNode = _grid.GetGridObject(x, y);
-                    Vector2 gridValueUV = Vector2.zero;
-
-                    if (pathNode.IsWalkable)
-                        gridValueUV = new Vector2(0.99f, 0f);
-                    
-                    MeshUtils.AddToMeshArrays(vertices, uv, triangles, index, _grid.GetWorldPosition(x, y) + quadSize * 0.5f, 0f, quadSize, gridValueUV, gridValueUV);
+                    tile.material = _grid.GetGridObject(x, y).IsWalkable ? _walkableMaterial : _unwalkableMaterial;
                 }
             }
-
-            _mesh.vertices = vertices;
-            _mesh.uv = uv;
-            _mesh.triangles = triangles;
         }
     }
 }

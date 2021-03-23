@@ -714,6 +714,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 12547fdf166cfb84fb314c7b7adfa177, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _tilePrefab: {fileID: 3458266813053083950, guid: 5d8e646cc1326204bb0badc47a794534,
+    type: 3}
+  _walkableMaterial: {fileID: 2100000, guid: 50cad82f70530ec478189adac87afd90, type: 2}
+  _unwalkableMaterial: {fileID: 2100000, guid: 35df878aea983664db587389dc55e808, type: 2}
 --- !u!4 &340989319
 Transform:
   m_ObjectHideFlags: 0
