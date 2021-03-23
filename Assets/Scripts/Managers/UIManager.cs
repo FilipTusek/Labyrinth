@@ -11,6 +11,11 @@ namespace Managers
             EventManager.OnLevelEditorToggle.OnEventRaised?.Invoke();
         }
 
+        public void ToggleCharacterActiveStatus()
+        {
+            EventManager.OnCharacterStatusToggle.OnEventRaised?.Invoke();
+        }
+
         public void SetGridWidth(string value)
         {
             int width = 0;

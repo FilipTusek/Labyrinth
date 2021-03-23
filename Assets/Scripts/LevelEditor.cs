@@ -15,6 +15,8 @@ public class LevelEditor : MonoBehaviour
     public int Height { get; private set; }
     public float CellSize { get; private set; }
 
+    private Vector2Int _minMaxGridSize;
+    
     private bool _isActive = false;
 
     private Pathfinding _pathfinding;
@@ -25,8 +27,8 @@ public class LevelEditor : MonoBehaviour
         EventManager.OnGridWidthChanged.OnEventRaised += SetWidth;
         EventManager.OnGridHeightChanged.OnEventRaised += SetHeight;
         EventManager.OnGenerateGrid.OnEventRaised += GenerateGrid;
-        EventManager.OnLMBPressed.OnEventRaised += SetPathNodeUnWalkable;
-        EventManager.OnRMBPressed.OnEventRaised += SetPathNodeWalkable;
+        EventManager.OnLMBHeld.OnEventRaised += SetPathNodeUnWalkable;
+        EventManager.OnRMBHeld.OnEventRaised += SetPathNodeWalkable;
     }
 
     private void OnDisable()
@@ -35,16 +37,16 @@ public class LevelEditor : MonoBehaviour
         EventManager.OnGridWidthChanged.OnEventRaised -= SetWidth;
         EventManager.OnGridHeightChanged.OnEventRaised -= SetHeight;
         EventManager.OnGenerateGrid.OnEventRaised -= GenerateGrid;
-        EventManager.OnLMBPressed.OnEventRaised -= SetPathNodeUnWalkable;
-        EventManager.OnRMBPressed.OnEventRaised -= SetPathNodeWalkable;
+        EventManager.OnLMBHeld.OnEventRaised -= SetPathNodeUnWalkable;
+        EventManager.OnRMBHeld.OnEventRaised -= SetPathNodeWalkable;
     }
 
     private void Start()
     {
-        Width = 10;
-        Height = 10;
-        CellSize = 10f;
-        
+        Width = 100;
+        Height = 100;
+        CellSize = 1f;
+
         GenerateGrid();
     }
 
@@ -55,12 +57,14 @@ public class LevelEditor : MonoBehaviour
 
     private void SetWidth(int value)
     {
-        Width = value;
+        if (value >= _minMaxGridSize.x)
+            Width = value;
     }
 
     private void SetHeight(int value)
     {
-        Height = value;
+        if (value >= _minMaxGridSize.y)
+            Height = value;
     }
 
     private void GenerateGrid()
