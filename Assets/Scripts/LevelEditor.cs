@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using GridMap;
+﻿using GridMap;
 using Labyrinth.Pathfinding;
-using Managers;
 using UnityEngine;
 using Utils.Events;
 
@@ -16,29 +12,27 @@ public class LevelEditor : MonoBehaviour
     public float CellSize { get; private set; }
 
     private Vector2Int _minMaxGridSize;
-    
-    private bool _isActive = false;
 
     private Pathfinding _pathfinding;
 
     private void OnEnable()
     {
-        EventManager.OnLevelEditorToggle.OnEventRaised += ToggleActiveState;
         EventManager.OnGridWidthChanged.OnEventRaised += SetWidth;
         EventManager.OnGridHeightChanged.OnEventRaised += SetHeight;
         EventManager.OnGenerateGrid.OnEventRaised += GenerateGrid;
         EventManager.OnLMBHeld.OnEventRaised += SetPathNodeUnWalkable;
         EventManager.OnRMBHeld.OnEventRaised += SetPathNodeWalkable;
+        EventManager.OnSaveLevel.OnEventRaised += SaveLevelData;
     }
 
     private void OnDisable()
     {
-        EventManager.OnLevelEditorToggle.OnEventRaised -= ToggleActiveState;
         EventManager.OnGridWidthChanged.OnEventRaised -= SetWidth;
         EventManager.OnGridHeightChanged.OnEventRaised -= SetHeight;
         EventManager.OnGenerateGrid.OnEventRaised -= GenerateGrid;
         EventManager.OnLMBHeld.OnEventRaised -= SetPathNodeUnWalkable;
         EventManager.OnRMBHeld.OnEventRaised -= SetPathNodeWalkable;
+        EventManager.OnSaveLevel.OnEventRaised -= SaveLevelData;
     }
 
     private void Start()
@@ -48,11 +42,6 @@ public class LevelEditor : MonoBehaviour
         CellSize = 1f;
 
         GenerateGrid();
-    }
-
-    private void ToggleActiveState()
-    {
-        _isActive = !_isActive;
     }
 
     private void SetWidth(int value)
@@ -71,19 +60,23 @@ public class LevelEditor : MonoBehaviour
     {
         _pathfinding = new Pathfinding(Width, Height, CellSize);
         _pathfindingVisual.SetGrid(_pathfinding.GetGrid());
+        EventManager.OnGridGenerated.OnEventRaised?.Invoke();
     }
 
     private void SetPathNodeWalkable(Vector3 worldPosition)
     {
-        if (!_isActive) return;
         _pathfinding.GetGrid().GetXY(worldPosition, out int x, out int y);
         _pathfinding.GetNode(x, y).SetIsWalkable(true);
     }
 
     private void SetPathNodeUnWalkable(Vector3 worldPosition)
     {
-        if (!_isActive) return;
         _pathfinding.GetGrid().GetXY(worldPosition, out int x, out int y);
         _pathfinding.GetNode(x, y)?.SetIsWalkable(false);
+    }
+
+    private void SaveLevelData()
+    {
+        
     }
 }

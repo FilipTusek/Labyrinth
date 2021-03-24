@@ -6,16 +6,6 @@ namespace Managers
 {
     public class UIManager : MonoBehaviour
     {
-        public void ToggleLevelEditor()
-        {
-            EventManager.OnLevelEditorToggle.OnEventRaised?.Invoke();
-        }
-
-        public void ToggleCharacterActiveStatus()
-        {
-            EventManager.OnCharacterStatusToggle.OnEventRaised?.Invoke();
-        }
-
         public void SetGridWidth(string value)
         {
             int width = 0;
@@ -41,6 +31,11 @@ namespace Managers
         public void GenerateGrid()
         {
             EventManager.OnGenerateGrid.OnEventRaised?.Invoke();
+        }
+
+        public void SaveLevel()
+        {
+            EventManager.OnSaveLevel.OnEventRaised?.Invoke();
         }
     }
 }

@@ -14,8 +14,6 @@ namespace CharacterScripts
         
         private int _currentPathIndex;
 
-        private bool _isActive = true;
-
         private void OnEnable()
         {
             EventManager.OnLMBPressed.OnEventRaised += SetTargetPosition;
@@ -28,7 +26,6 @@ namespace CharacterScripts
 
         private void Update()
         {
-            if (!_isActive) return;
             HandleMovement();
         }
 
@@ -53,11 +50,6 @@ namespace CharacterScripts
         {
             _pathVectorList = null;
         }
-
-        private void ToggleActiveStatus()
-        {
-            _isActive = !_isActive;
-        }
         
         public Vector3 GetPosition()
         {
@@ -66,7 +58,6 @@ namespace CharacterScripts
 
         public void SetTargetPosition(Vector3 targetPosition)
         {
-            if (!_isActive) return;
             _currentPathIndex = 0;
             _pathVectorList = Pathfinding.Instance.FindPath(GetPosition(), targetPosition);
             

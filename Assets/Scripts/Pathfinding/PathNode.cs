@@ -1,8 +1,10 @@
-﻿using GridMap;
+﻿using System;
+using GridMap;
 using UnityEngine;
 
 namespace Labyrinth.Pathfinding
 {
+    [Serializable]
     public class PathNode
     {
         private Grid<PathNode> _grid;

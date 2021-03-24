@@ -117,5 +117,10 @@ namespace GridMap
         {
             return _cellSize;
         }
+
+        public TGridObject[,] GetGridArray()
+        {
+            return _gridArray;
+        }
     }
 }
