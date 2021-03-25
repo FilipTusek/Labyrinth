@@ -1,5 +1,7 @@
-﻿using GridMap;
+﻿using System.Collections.Generic;
+using GridMap;
 using Labyrinth.Pathfinding;
+using SaveLoadScripts;
 using UnityEngine;
 using Utils.Events;
 
@@ -7,6 +9,7 @@ public class GridManager : MonoBehaviour
 {
     [SerializeField] private PathfindingVisual _pathfindingVisual;
 
+    [SerializeField] private bool _levelEditorActive = false; //Can be handled much better, but this will suffice for this use case
     public int Width { get; private set; }
     public int Height { get; private set; }
     public float CellSize { get; private set; }
@@ -20,9 +23,12 @@ public class GridManager : MonoBehaviour
         EventManager.OnGridWidthChanged.OnEventRaised += SetWidth;
         EventManager.OnGridHeightChanged.OnEventRaised += SetHeight;
         EventManager.OnGenerateGrid.OnEventRaised += GenerateGrid;
+        EventManager.OnSaveLevel.OnEventRaised += Save;
+        EventManager.OnLoadLevel.OnEventRaised += Load;
+
+        if (!_levelEditorActive) return;
         EventManager.OnLMBHeld.OnEventRaised += SetPathNodeUnWalkable;
         EventManager.OnRMBHeld.OnEventRaised += SetPathNodeWalkable;
-        EventManager.OnLoadComplete.OnEventRaised += SetupVisuals;
     }
 
     private void OnDisable()
@@ -30,18 +36,60 @@ public class GridManager : MonoBehaviour
         EventManager.OnGridWidthChanged.OnEventRaised -= SetWidth;
         EventManager.OnGridHeightChanged.OnEventRaised -= SetHeight;
         EventManager.OnGenerateGrid.OnEventRaised -= GenerateGrid;
+        EventManager.OnSaveLevel.OnEventRaised -= Save;
+        EventManager.OnLoadLevel.OnEventRaised -= Load;
+        
+        if (!_levelEditorActive) return;
         EventManager.OnLMBHeld.OnEventRaised -= SetPathNodeUnWalkable;
         EventManager.OnRMBHeld.OnEventRaised -= SetPathNodeWalkable;
-        EventManager.OnLoadComplete.OnEventRaised -= SetupVisuals;
     }
 
     private void Start()
     {
-        Width = 100;
-        Height = 100;
-        CellSize = 1f;
+        Load();
+    }
 
+    private void Save()
+    {
+        List<PathNode.SaveObject> pathNodeSaveObjectList = new List<PathNode.SaveObject>();
+        for (int x = 0; x < _pathfinding.GetGrid().GetWidth(); x++) {
+            for (int y = 0; y < _pathfinding.GetGrid().GetHeight(); y++) {
+                PathNode pathNode = _pathfinding.GetGrid().GetGridObject(x, y);
+                pathNodeSaveObjectList.Add(pathNode.Save());
+            }
+        }
+
+        SaveObject saveObject = new SaveObject
+        {
+            Width = _pathfinding.GetGrid().GetWidth(), Height = _pathfinding.GetGrid().GetHeight(), CellSize = _pathfinding.GetGrid().GetCellSize(),
+            PathNodeSaveObjectArray = pathNodeSaveObjectList.ToArray()
+        };
+
+        SaveSystem.SaveObject(saveObject);
+    }
+
+    private void Load()
+    {
+        SaveObject saveObject = SaveSystem.LoadMostRecentObject<SaveObject>();
+        if (saveObject == null) {
+            Width = 100;
+            Height = 100;
+            CellSize = 1f;
+            GenerateGrid();
+            SetPathfindingVisualGrid();
+            return;
+        }
+
+        Width = saveObject.Width;
+        Height = saveObject.Height;
+        CellSize = saveObject.CellSize;
         GenerateGrid();
+        foreach (var pathNodeSaveObject in saveObject.PathNodeSaveObjectArray) {
+            PathNode pathNode = _pathfinding.GetGrid().GetGridObject(pathNodeSaveObject.X, pathNodeSaveObject.Y);
+            pathNode.Load(pathNodeSaveObject);
+        }
+
+        SetPathfindingVisualGrid();
     }
 
     private void SetWidth(int value)
@@ -59,7 +107,7 @@ public class GridManager : MonoBehaviour
     private void GenerateGrid()
     {
         _pathfinding = new Pathfinding(Width, Height, CellSize);
-        SetupVisuals();
+        EventManager.OnGridGenerated.OnEventRaised?.Invoke();
     }
 
     private void SetPathNodeWalkable(Vector3 worldPosition)
@@ -79,9 +127,11 @@ public class GridManager : MonoBehaviour
         _pathfindingVisual.SetGrid(_pathfinding.GetGrid());
     }
 
-    private void SetupVisuals()
+    public class SaveObject
     {
-        SetPathfindingVisualGrid();
-        EventManager.OnGridGenerated.OnEventRaised?.Invoke();
+        public int Width;
+        public int Height;
+        public float CellSize;
+        public PathNode.SaveObject[] PathNodeSaveObjectArray;
     }
 }

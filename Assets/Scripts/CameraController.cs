@@ -58,7 +58,7 @@ public class CameraController : MonoBehaviour
 
     private void PositionCameraToLowerLeftGridCorner()
     {
-        transform.position = new Vector3(_camera.orthographicSize + 10, _camera.orthographicSize);
+        transform.position = new Vector3(_camera.orthographicSize + 10, _camera.orthographicSize, -10);
     }
 
     private void ZoomCamera(float value)
