@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using GridMap;
+using SaveLoadScripts;
 using Unity.Mathematics;
 using UnityEngine;
+using Utils.Events;
 
 namespace Labyrinth.Pathfinding
 {
@@ -21,9 +23,47 @@ namespace Labyrinth.Pathfinding
         public Pathfinding(int width, int height, float cellSize)
         {
             Instance = this;
-            _grid = new Grid<PathNode>(width, height, cellSize, Vector3.zero, (Grid<PathNode> _grid, int x, int y) => new PathNode(_grid, x, y));
+            _grid = new Grid<PathNode>(width, height, cellSize, Vector3.zero, (Grid<PathNode> grid, int x, int y) => new PathNode(grid, x, y));
+
+            EventManager.OnSaveLevel.OnEventRaised += Save;
+            EventManager.OnLoadLevel.OnEventRaised += Load;
         }
 
+        private void Save()
+        {
+            List<PathNode.SaveObject> pathNodeSaveObjectList = new List<PathNode.SaveObject>();
+            for (int x = 0; x < _grid.GetWidth(); x++) {
+                for (int y = 0; y < _grid.GetHeight(); y++) {
+                    PathNode pathNode = _grid.GetGridObject(x, y);
+                    pathNodeSaveObjectList.Add(pathNode.Save());
+                }
+            }
+
+            SaveObject saveObject = new SaveObject {Width = _grid.GetWidth(), Height = _grid.GetHeight(), CellSize = _grid.GetCellSize(), PathNodeSaveObjectArray = pathNodeSaveObjectList.ToArray()};
+            
+            SaveSystem.SaveObject(saveObject);
+        }
+
+        private void Load()
+        {
+            SaveObject saveObject = SaveSystem.LoadMostRecentObject<SaveObject>();
+            _grid = new Grid<PathNode>(saveObject.Width, saveObject.Height, saveObject.CellSize, Vector3.zero, ( grid, x, y) => new PathNode(grid, x, y));
+            foreach (var pathNodeSaveObject in saveObject.PathNodeSaveObjectArray) {
+                PathNode pathNode = _grid.GetGridObject(pathNodeSaveObject.X, pathNodeSaveObject.Y);
+                pathNode.Load(pathNodeSaveObject);
+            }
+            
+            EventManager.OnLoadComplete.OnEventRaised?.Invoke();
+        }
+
+        public class SaveObject
+        {
+            public int Width;
+            public int Height;
+            public float CellSize;
+            public PathNode.SaveObject[] PathNodeSaveObjectArray;
+        }
+        
         public Grid<PathNode> GetGrid()
         {
             return _grid;

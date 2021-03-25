@@ -42,5 +42,28 @@ namespace Labyrinth.Pathfinding
             //return X + "," + Y;
             return "" + IsWalkable;
         }
+
+        [Serializable]
+        public class SaveObject
+        {
+            public bool IsWalkable;
+            public int X;
+            public int Y;
+        }
+
+        public SaveObject Save()
+        {
+            return new SaveObject
+            {
+                IsWalkable = IsWalkable,
+                X = X,
+                Y = Y
+            };
+        }
+
+        public void Load(SaveObject saveObject)
+        {
+            IsWalkable = saveObject.IsWalkable;
+        }
     }
 }

@@ -21,5 +21,7 @@ namespace Utils.Events
         public static readonly Event OnGenerateGrid = new Event();
         public static readonly Event OnGridGenerated = new Event();
         public static readonly Event OnSaveLevel = new Event();
+        public static readonly Event OnLoadLevel = new Event();
+        public static readonly Event OnLoadComplete = new Event();
     }
 }

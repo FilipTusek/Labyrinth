@@ -3,7 +3,7 @@ using Labyrinth.Pathfinding;
 using UnityEngine;
 using Utils.Events;
 
-public class LevelEditor : MonoBehaviour
+public class GridManager : MonoBehaviour
 {
     [SerializeField] private PathfindingVisual _pathfindingVisual;
 
@@ -22,7 +22,7 @@ public class LevelEditor : MonoBehaviour
         EventManager.OnGenerateGrid.OnEventRaised += GenerateGrid;
         EventManager.OnLMBHeld.OnEventRaised += SetPathNodeUnWalkable;
         EventManager.OnRMBHeld.OnEventRaised += SetPathNodeWalkable;
-        EventManager.OnSaveLevel.OnEventRaised += SaveLevelData;
+        EventManager.OnLoadComplete.OnEventRaised += SetupVisuals;
     }
 
     private void OnDisable()
@@ -32,7 +32,7 @@ public class LevelEditor : MonoBehaviour
         EventManager.OnGenerateGrid.OnEventRaised -= GenerateGrid;
         EventManager.OnLMBHeld.OnEventRaised -= SetPathNodeUnWalkable;
         EventManager.OnRMBHeld.OnEventRaised -= SetPathNodeWalkable;
-        EventManager.OnSaveLevel.OnEventRaised -= SaveLevelData;
+        EventManager.OnLoadComplete.OnEventRaised -= SetupVisuals;
     }
 
     private void Start()
@@ -59,8 +59,7 @@ public class LevelEditor : MonoBehaviour
     private void GenerateGrid()
     {
         _pathfinding = new Pathfinding(Width, Height, CellSize);
-        _pathfindingVisual.SetGrid(_pathfinding.GetGrid());
-        EventManager.OnGridGenerated.OnEventRaised?.Invoke();
+        SetupVisuals();
     }
 
     private void SetPathNodeWalkable(Vector3 worldPosition)
@@ -75,8 +74,14 @@ public class LevelEditor : MonoBehaviour
         _pathfinding.GetNode(x, y)?.SetIsWalkable(false);
     }
 
-    private void SaveLevelData()
+    private void SetPathfindingVisualGrid()
     {
-        
+        _pathfindingVisual.SetGrid(_pathfinding.GetGrid());
+    }
+
+    private void SetupVisuals()
+    {
+        SetPathfindingVisualGrid();
+        EventManager.OnGridGenerated.OnEventRaised?.Invoke();
     }
 }

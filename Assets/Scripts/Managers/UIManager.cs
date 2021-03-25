@@ -37,5 +37,10 @@ namespace Managers
         {
             EventManager.OnSaveLevel.OnEventRaised?.Invoke();
         }
+
+        public void LoadLevel()
+        {
+            EventManager.OnLoadLevel.OnEventRaised?.Invoke();
+        }
     }
 }
